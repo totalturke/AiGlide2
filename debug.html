@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Debug Console - CSV Plugin</title>
+    <style>
+        body {
+            font-family: monospace;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #1e1e1e;
+            color: #d4d4d4;
+        }
+
+        h1 {
+            color: #4ec9b0;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .section {
+            background: #252526;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #3e3e42;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            background: #3c3c3c;
+            border: 1px solid #555;
+            border-radius: 4px;
+            color: #d4d4d4;
+            font-family: monospace;
+        }
+
+        button {
+            background: #0e639c;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: monospace;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #1177bb;
+        }
+
+        #console {
+            background: #1e1e1e;
+            padding: 15px;
+            border-radius: 4px;
+            height: 400px;
+            overflow-y: auto;
+            font-size: 13px;
+            line-height: 1.5;
+            border: 1px solid #3e3e42;
+        }
+
+        .log-entry {
+            margin: 2px 0;
+            padding: 2px 4px;
+        }
+
+        .log-info {
+            color: #4fc1ff;
+        }
+
+        .log-error {
+            color: #f48771;
+        }
+
+        .log-success {
+            color: #73c991;
+        }
+
+        .log-warn {
+            color: #dcdcaa;
+        }
+
+        #result {
+            background: #1e1e1e;
+            padding: 15px;
+            border-radius: 4px;
+            min-height: 150px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            font-size: 12px;
+            border: 1px solid #3e3e42;
+            margin-top: 10px;
+        }
+
+        .clear-btn {
+            background: #666;
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+
+        .clear-btn:hover {
+            background: #888;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🐛 CSV Plugin Debug Console</h1>
+
+    <div class="container">
+        <div class="section">
+            <h3>Test Plugin</h3>
+            <input id="sheetUrl" type="text" placeholder="Paste Google Sheets CSV URL"
+                value="https://docs.google.com/spreadsheets/d/e/2PACX-1vS5Hg-TvirNFWb_5YG9KG48_vi1FFyyNYQSaubdzCG9tci5lqrKKJ-ANvkgHmyr-8D6uyyOvfYwRSai/pub?output=csv" />
+            <button id="testBtn">Run Plugin</button>
+            <button class="clear-btn" id="clearBtn">Clear Logs</button>
+
+            <h4 style="margin-top: 20px;">Result:</h4>
+            <div id="result">No result yet...</div>
+        </div>
+
+        <div class="section">
+            <h3>Console Logs</h3>
+            <div id="console"></div>
+        </div>
+    </div>
+
+    <script src="function.js"></script>
+    <script>
+        const consoleEl = document.getElementById('console');
+        const resultEl = document.getElementById('result');
+
+        // Override console.log to capture logs
+        const originalLog = console.log;
+        console.log = function (...args) {
+            originalLog.apply(console, args);
+
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+
+            const message = args.map(arg =>
+                typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+            ).join(' ');
+
+            // Color code based on message content
+            if (message.includes('Error')) {
+                entry.className += ' log-error';
+            } else if (message.includes('Success') || message.includes('completed')) {
+                entry.className += ' log-success';
+            } else if (message.includes('Warning') || message.includes('Timeout')) {
+                entry.className += ' log-warn';
+            } else {
+                entry.className += ' log-info';
+            }
+
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            consoleEl.appendChild(entry);
+            consoleEl.scrollTop = consoleEl.scrollHeight;
+        };
+
+        document.getElementById('testBtn').onclick = async () => {
+            const url = document.getElementById('sheetUrl').value.trim();
+
+            console.log('='.repeat(60));
+            console.log('🚀 Starting new test...');
+            console.log('='.repeat(60));
+
+            resultEl.textContent = '⏳ Running...';
+            resultEl.style.color = '#dcdcaa';
+
+            try {
+                const startTime = Date.now();
+                const result = await window.function({ value: url });
+                const duration = Date.now() - startTime;
+
+                console.log(`✅ Function completed in ${duration}ms`);
+
+                if (result.startsWith('Error:')) {
+                    resultEl.style.color = '#f48771';
+                } else {
+                    resultEl.style.color = '#73c991';
+                }
+                resultEl.textContent = result;
+            } catch (e) {
+                console.log('❌ Exception caught:', e.message);
+                resultEl.style.color = '#f48771';
+                resultEl.textContent = `Exception: ${e.message}`;
+            }
+        };
+
+        document.getElementById('clearBtn').onclick = () => {
+            consoleEl.innerHTML = '';
+            console.log('Console cleared');
+        };
+
+        console.log('Debug console ready. Click "Run Plugin" to start testing.');
+    </script>
+</body>
+
+</html>
