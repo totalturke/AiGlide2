@@ -52,6 +52,13 @@ window.function = async function (sheet_url) {
 
 		console.log('[CSV Plugin] Reading response text...');
 		const csvData = await response.text();
+
+		// Check if the response is HTML (which usually means the sheet is not published or private)
+		if (csvData.trim().toLowerCase().startsWith('<!doctype html') || csvData.trim().toLowerCase().startsWith('<html')) {
+			console.log('[CSV Plugin] Error: Received HTML instead of CSV');
+			return 'Error: The URL returned HTML instead of CSV. Please make sure the Google Sheet is published to the web as CSV.';
+		}
+
 		console.log('[CSV Plugin] CSV data length:', csvData.length);
 		console.log('[CSV Plugin] First 100 chars:', csvData.substring(0, 100));
 

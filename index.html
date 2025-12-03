@@ -5,203 +5,375 @@
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<title>Google Sheets CSV Fetcher - Glide Plugin</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 	<style>
+		:root {
+			--primary: #6366f1;
+			--primary-dark: #4f46e5;
+			--secondary: #ec4899;
+			--bg-gradient: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+			--card-bg: rgba(255, 255, 255, 0.05);
+			--card-border: rgba(255, 255, 255, 0.1);
+			--text-main: #f8fafc;
+			--text-muted: #94a3b8;
+			--success: #10b981;
+			--error: #ef4444;
+		}
+
+		* {
+			box-sizing: border-box;
+			margin: 0;
+			padding: 0;
+		}
+
 		body {
-			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-			max-width: 800px;
-			margin: 0 auto;
-			padding: 40px 20px;
+			font-family: 'Inter', sans-serif;
+			background: var(--bg-gradient);
+			color: var(--text-main);
+			min-height: 100vh;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			padding: 20px;
 			line-height: 1.6;
-			color: #333;
+		}
+
+		.container {
+			width: 100%;
+			max-width: 900px;
+			background: var(--card-bg);
+			backdrop-filter: blur(20px);
+			-webkit-backdrop-filter: blur(20px);
+			border: 1px solid var(--card-border);
+			border-radius: 24px;
+			padding: 40px;
+			box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+		}
+
+		header {
+			text-align: center;
+			margin-bottom: 40px;
 		}
 
 		h1 {
-			color: #2563eb;
+			font-size: 2.5rem;
+			font-weight: 700;
+			background: linear-gradient(to right, #818cf8, #f472b6);
+			-webkit-background-clip: text;
+			background-clip: text;
+			-webkit-text-fill-color: transparent;
+			margin-bottom: 10px;
+			letter-spacing: -0.02em;
+		}
+
+		p.subtitle {
+			color: var(--text-muted);
+			font-size: 1.1rem;
+		}
+
+		.grid {
+			display: grid;
+			grid-template-columns: 1fr;
+			gap: 30px;
+		}
+
+		@media (min-width: 768px) {
+			.grid {
+				grid-template-columns: 1.2fr 0.8fr;
+			}
+		}
+
+		.card {
+			background: rgba(0, 0, 0, 0.2);
+			border-radius: 16px;
+			padding: 24px;
+			border: 1px solid var(--card-border);
 		}
 
 		h2 {
-			color: #1e40af;
-			margin-top: 30px;
+			font-size: 1.25rem;
+			margin-bottom: 20px;
+			color: var(--text-main);
+			display: flex;
+			align-items: center;
+			gap: 10px;
 		}
 
-		code {
-			background: #f3f4f6;
-			padding: 2px 6px;
-			border-radius: 3px;
-			font-size: 0.9em;
+		.input-group {
+			margin-bottom: 20px;
 		}
 
-		pre {
-			background: #f3f4f6;
-			padding: 15px;
-			border-radius: 5px;
-			overflow-x: auto;
+		label {
+			display: block;
+			margin-bottom: 8px;
+			font-size: 0.9rem;
+			color: var(--text-muted);
+			font-weight: 500;
 		}
 
-		.demo {
-			background: #eff6ff;
-			border-left: 4px solid #2563eb;
-			padding: 20px;
-			margin: 20px 0;
-			border-radius: 5px;
-		}
-
-		.test-section {
-			background: #f9fafb;
-			padding: 20px;
-			border-radius: 8px;
-			margin: 30px 0;
-		}
-
-		input {
+		input[type="text"] {
 			width: 100%;
-			padding: 10px;
-			margin: 10px 0;
-			border: 1px solid #d1d5db;
-			border-radius: 5px;
-			font-size: 14px;
+			background: rgba(0, 0, 0, 0.3);
+			border: 1px solid var(--card-border);
+			padding: 12px 16px;
+			border-radius: 12px;
+			color: white;
+			font-family: 'Inter', sans-serif;
+			font-size: 1rem;
+			transition: all 0.3s ease;
+		}
+
+		input[type="text"]:focus {
+			outline: none;
+			border-color: var(--primary);
+			box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
 		}
 
 		button {
-			background: #2563eb;
+			width: 100%;
+			background: linear-gradient(135deg, var(--primary), var(--primary-dark));
 			color: white;
-			padding: 10px 20px;
 			border: none;
-			border-radius: 5px;
+			padding: 14px;
+			border-radius: 12px;
+			font-size: 1rem;
+			font-weight: 600;
 			cursor: pointer;
-			font-size: 14px;
+			transition: transform 0.2s, box-shadow 0.2s;
 		}
 
 		button:hover {
-			background: #1e40af;
+			transform: translateY(-2px);
+			box-shadow: 0 10px 20px -10px rgba(99, 102, 241, 0.5);
+		}
+
+		button:active {
+			transform: translateY(0);
+		}
+
+		.status {
+			margin-top: 15px;
+			padding: 12px;
+			border-radius: 8px;
+			font-size: 0.9rem;
+			display: none;
+		}
+
+		.status.success {
+			display: block;
+			background: rgba(16, 185, 129, 0.1);
+			color: #34d399;
+			border: 1px solid rgba(16, 185, 129, 0.2);
+		}
+
+		.status.error {
+			display: block;
+			background: rgba(239, 68, 68, 0.1);
+			color: #f87171;
+			border: 1px solid rgba(239, 68, 68, 0.2);
+		}
+
+		.status.loading {
+			display: block;
+			background: rgba(255, 255, 255, 0.1);
+			color: var(--text-muted);
+			text-align: center;
 		}
 
 		textarea {
 			width: 100%;
-			height: 200px;
+			height: 300px;
+			background: rgba(0, 0, 0, 0.3);
+			border: 1px solid var(--card-border);
+			border-radius: 12px;
+			padding: 16px;
+			color: #e2e8f0;
+			font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+			font-size: 0.85rem;
+			resize: none;
+			margin-top: 20px;
+		}
+
+		.steps {
+			list-style: none;
+			counter-reset: step;
+		}
+
+		.steps li {
+			position: relative;
+			padding-left: 40px;
+			margin-bottom: 20px;
+			color: var(--text-muted);
+			font-size: 0.95rem;
+		}
+
+		.steps li::before {
+			counter-increment: step;
+			content: counter(step);
+			position: absolute;
+			left: 0;
+			top: 0;
+			width: 28px;
+			height: 28px;
+			background: rgba(255, 255, 255, 0.1);
+			border-radius: 50%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 0.8rem;
+			font-weight: 700;
+			color: white;
+		}
+
+		.steps li strong {
+			color: white;
+			display: block;
+			margin-bottom: 4px;
+		}
+
+		.code-block {
+			background: rgba(0, 0, 0, 0.3);
 			padding: 10px;
-			margin: 10px 0;
-			border: 1px solid #d1d5db;
-			border-radius: 5px;
+			border-radius: 6px;
 			font-family: monospace;
-			font-size: 12px;
-		}
-
-		.status {
-			margin: 10px 0;
-			padding: 10px;
-			border-radius: 5px;
-		}
-
-		.success {
-			background: #d1fae5;
-			color: #065f46;
-		}
-
-		.error {
-			background: #fee2e2;
-			color: #991b1b;
-		}
-
-		.loading {
-			background: #fef3c7;
-			color: #92400e;
+			font-size: 0.8rem;
+			color: #a5b4fc;
+			margin-top: 5px;
+			word-break: break-all;
 		}
 
 		a {
-			color: #2563eb;
+			color: var(--secondary);
+			text-decoration: none;
+			transition: color 0.2s;
+		}
+
+		a:hover {
+			color: #f472b6;
+		}
+
+		.badge {
+			display: inline-block;
+			padding: 4px 8px;
+			border-radius: 4px;
+			font-size: 0.75rem;
+			font-weight: 600;
+			background: rgba(255, 255, 255, 0.1);
+			color: var(--text-muted);
+			margin-right: 8px;
 		}
 	</style>
 </head>
 
 <body>
-	<h1>🚀 Google Sheets CSV Fetcher</h1>
-	<p>A Glide plugin that fetches CSV data from published Google Sheets URLs.</p>
+	<div class="container">
+		<header>
+			<h1>Google Sheets CSV Fetcher</h1>
+			<p class="subtitle">A powerful Glide plugin to fetch raw CSV data from any published Google Sheet.</p>
+		</header>
 
-	<div class="demo">
-		<h3>📦 Plugin Repository</h3>
-		<p><strong>GitHub:</strong> <a href="https://github.com/totalturke/AiGlide2"
-				target="_blank">totalturke/AiGlide2</a></p>
-		<p><strong>Cloudflare Worker:</strong> <code>https://csv.aimike0411.workers.dev</code></p>
+		<div class="grid">
+			<div class="main-content">
+				<div class="card">
+					<h2>⚡️ Live Test</h2>
+					<div class="input-group">
+						<label>Google Sheets CSV URL</label>
+						<input id="sheetUrl" type="text"
+							placeholder="https://docs.google.com/spreadsheets/.../pub?output=csv" />
+					</div>
+					<button id="testBtn">Fetch CSV Data</button>
+
+					<div id="status" class="status"></div>
+					<textarea id="output" readonly placeholder="Resulting CSV data will appear here..."></textarea>
+				</div>
+			</div>
+
+			<div class="sidebar">
+				<div class="card">
+					<h2>📚 How to Use</h2>
+					<ol class="steps">
+						<li>
+							<strong>Publish your Sheet</strong>
+							File → Share → Publish to web → Select "CSV"
+						</li>
+						<li>
+							<strong>Install in Glide</strong>
+							Add a "Computed Column" → Select "Custom Plugin"
+						</li>
+						<li>
+							<strong>Configure</strong>
+							Paste the repository URL:
+							<div class="code-block">https://github.com/totalturke/AiGlide2</div>
+						</li>
+					</ol>
+				</div>
+
+				<div class="card" style="margin-top: 20px;">
+					<h2>✨ Features</h2>
+					<div style="display: flex; flex-wrap: wrap; gap: 8px;">
+						<span class="badge">CORS Bypass</span>
+						<span class="badge">Raw CSV</span>
+						<span class="badge">Fast</span>
+						<span class="badge">Secure</span>
+					</div>
+					<p style="margin-top: 15px; font-size: 0.9rem; color: var(--text-muted);">
+						Powered by Cloudflare Workers for reliable, high-performance data fetching.
+					</p>
+				</div>
+			</div>
+		</div>
 	</div>
-
-	<h2>🧪 Test the Plugin</h2>
-	<div class="test-section">
-		<input id="sheetUrl" type="text" placeholder="Paste your Google Sheets CSV URL (must end with /pub?output=csv)"
-			value="https://docs.google.com/spreadsheets/d/e/2PACX-1vS5Hg-TvirNFWb_5YG9KG48_vi1FFyyNYQSaubdzCG9tci5lqrKKJ-ANvkgHmyr-8D6uyyOvfYwRSai/pub?output=csv" />
-		<button id="testBtn">Test Plugin</button>
-		<div id="status"></div>
-		<textarea id="output" readonly placeholder="CSV data will appear here..."></textarea>
-	</div>
-
-	<h2>📖 How to Use</h2>
-
-	<h3>1. Publish Your Google Sheet</h3>
-	<ol>
-		<li>Open your Google Sheet</li>
-		<li>Go to <strong>File → Share → Publish to web</strong></li>
-		<li>Select <strong>CSV</strong> as the format</li>
-		<li>Copy the generated URL</li>
-	</ol>
-
-	<h3>2. Install in Glide</h3>
-	<ol>
-		<li>Open your Glide app</li>
-		<li>Add a <strong>Computed Column</strong></li>
-		<li>Select <strong>Custom Plugin</strong></li>
-		<li>Use this repository URL</li>
-		<li>Pass your published CSV URL as the parameter</li>
-	</ol>
-
-	<h2>✨ Features</h2>
-	<ul>
-		<li>✅ Fetches CSV data from published Google Sheets</li>
-		<li>✅ Uses Cloudflare Worker proxy to bypass CORS</li>
-		<li>✅ Returns raw CSV as plain text</li>
-		<li>✅ Validates URLs before fetching</li>
-		<li>✅ Handles errors gracefully</li>
-	</ul>
-
-	<h2>⚙️ How It Works</h2>
-	<p>The plugin uses a Cloudflare Worker as a proxy to fetch the CSV data from Google Sheets. This bypasses CORS
-		restrictions and ensures the data is returned as plain text instead of triggering a browser download.</p>
-
-	<h2>📝 Example Output</h2>
-	<pre>Numbers,Names
-1,Peter
-2,Luca
-3,Maria
-4,Miguel
-5,Marc
-6,Juan</pre>
 
 	<script src="function.js"></script>
 	<script>
 		document.getElementById('testBtn').onclick = async () => {
-			const url = document.getElementById('sheetUrl').value.trim();
+			const urlInput = document.getElementById('sheetUrl');
 			const statusEl = document.getElementById('status');
 			const outputEl = document.getElementById('output');
+			const btn = document.getElementById('testBtn');
+
+			const url = urlInput.value.trim();
 
 			if (!url) {
 				statusEl.className = 'status error';
-				statusEl.textContent = 'Please enter a URL';
+				statusEl.textContent = '⚠️ Please enter a Google Sheets CSV URL';
 				return;
 			}
 
+			// UI Loading State
+			btn.disabled = true;
+			btn.style.opacity = '0.7';
+			btn.textContent = 'Fetching...';
 			statusEl.className = 'status loading';
-			statusEl.textContent = 'Loading...';
+			statusEl.textContent = 'Connecting to Cloudflare Worker...';
 			outputEl.value = '';
 
 			try {
-				// Call the plugin function
+				const startTime = Date.now();
 				const result = await window.function({ value: url });
-				statusEl.className = 'status success';
-				statusEl.textContent = '✅ Success! CSV data fetched.';
-				outputEl.value = result;
+				const duration = Date.now() - startTime;
+
+				btn.disabled = false;
+				btn.style.opacity = '1';
+				btn.textContent = 'Fetch CSV Data';
+
+				if (result.startsWith('Error:')) {
+					statusEl.className = 'status error';
+					statusEl.textContent = '❌ ' + result;
+				} else {
+					statusEl.className = 'status success';
+					statusEl.textContent = `✅ Successfully fetched ${result.length} bytes in ${duration}ms`;
+					outputEl.value = result;
+				}
 			} catch (e) {
+				btn.disabled = false;
+				btn.style.opacity = '1';
+				btn.textContent = 'Fetch CSV Data';
+
 				statusEl.className = 'status error';
-				statusEl.textContent = '❌ Error: ' + e.message;
-				outputEl.value = '';
+				statusEl.textContent = '❌ Exception: ' + e.message;
 			}
 		};
 	</script>

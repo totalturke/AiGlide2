@@ -78,6 +78,12 @@ The proxy handles CORS and ensures the CSV data is returned as plain text instea
 - Make sure the URL ends with `/pub?output=csv`
 - Republish your sheet if needed
 
+### "Received HTML instead of CSV"
+- The URL provided returned an HTML page (likely a 404 or "File not found" page)
+- Check that the Google Sheet is published to the web
+- Ensure you selected "CSV" as the format when publishing
+- Verify the URL is correct and accessible in a private browser window
+
 ### "Failed to fetch CSV"
 - Check that the Google Sheet is published and publicly accessible
 - Verify the URL is correct
