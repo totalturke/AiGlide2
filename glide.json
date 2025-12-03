@@ -1,38 +1,15 @@
 [
 	{
 		"kind": "column",
-		"name": "Glide Plugin Starter with AI",
-		"description": "This plugin allows you to pass a prompt and optionally an image URL to generate responses using configurable OpenRouter AI models.",
-		"author": "Marco Volpato <marco@loqode.com>",
+		"name": "Google Sheets CSV Fetcher",
+		"description": "Fetches CSV data from a published Google Sheets URL and returns it as plain text.",
+		"author": "Your Name",
 		"params": [
 			{
-				"name": "prompt",
-				"displayName": "Prompt",
-				"type": "string"
-			},
-			{
-				"name": "image_url",
-				"displayName": "Image URL",
+				"name": "sheet_url",
+				"displayName": "Google Sheets CSV URL",
 				"type": "string",
-				"description": "URL to an image or base64 data URI for analysis"
-			},
-			{
-				"name": "model",
-				"displayName": "AI Model",
-				"type": "string",
-				"default": "google/gemma-3-27b-it:free",
-				"description": "OpenRouter model to use (e.g., google/gemma-3-27b-it:free, meta-llama/llama-3.2-11b-vision-instruct:free)"
-			},
-			{
-				"name": "use_openrouter",
-				"displayName": "Use OpenRouter AI",
-				"type": "boolean",
-				"default": false
-			},
-			{
-				"name": "openrouter_api_key",
-				"displayName": "OpenRouter API Key",
-				"type": "string"
+				"description": "The published Google Sheets URL (must end with /pub?output=csv)"
 			}
 		],
 		"result": {
